@@ -1,100 +1,164 @@
-import Image from "next/image";
+"use client";
+
+import { useEffect, useState } from "react";
+import {
+  motion,
+  useScroll,
+  useSpring,
+  useMotionValue,
+  useTransform,
+} from "framer-motion";
+import dynamic from "next/dynamic";
+import { Button } from "./components/ui/button";
+import { InfiniteMovingCardsDemo } from "./components/app/InfiniteMovingCardsDemo";
+import { HeroSection } from "./components/app/HeroSection";
+import { ExperienceSection } from "./components/app/ExperienceSection";
+import { SkillsSection } from "./components/app/SkillsSection";
+import { ProjectsSection } from "./components/app/ProjectsSection";
+import { CommunityLeadershipSection } from "./components/app/CommunityLeadershipSection";
+import { WorkshopsSection } from "./components/app/WokshopSection";
+import { ContactSection } from "./components/app/ContactSection";
+
+const Background3D = dynamic(() => import("./components/ui/Background3D"), {
+  ssr: false,
+});
 
 export default function Home() {
-  return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="https://nextjs.org/icons/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              app/page.tsx
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+  const [activeSection, setActiveSection] = useState("about");
+  const { scrollYProgress } = useScroll();
+  const scaleX = useSpring(scrollYProgress, {
+    stiffness: 100,
+    damping: 30,
+    restDelta: 0.001,
+  });
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+  const [cryptoPrice, setCryptoPrice] = useState({ eth: 2000, btc: 30000 });
+  const [blockNumber, setBlockNumber] = useState(0);
+
+  const sections = [
+    "about",
+    "experience",
+    "skills",
+    "projects",
+    "community",
+    "contact",
+  ];
+
+  const glowX = useMotionValue(0);
+  const glowY = useMotionValue(0);
+  const glowOpacity = useTransform(glowX, [-100, 100], [0, 1]);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCryptoPrice({
+        eth: Math.random() * 1000 + 2000,
+        btc: Math.random() * 10000 + 30000,
+      });
+      setBlockNumber((prev) => prev + 1);
+    }, 5000);
+
+    const handleMouseMove = (e: MouseEvent) => {
+      glowX.set(e.clientX);
+      glowY.set(e.clientY);
+    };
+
+    window.addEventListener("mousemove", handleMouseMove);
+
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener("mousemove", handleMouseMove);
+    };
+  }, [glowX, glowY]);
+
+  return (
+    <div className="min-h-screen bg-gradient-to-b from-gray-900 to-black text-white overflow-hidden">
+      <Background3D />
+
+      {/* Subtle gradient background */}
+      <div className="fixed inset-0 bg-gradient-to-br from-indigo-900/20 via-purple-900/20 to-gray-900/20 z-0" />
+
+      {/* Glow effect */}
+      <motion.div
+        className="fixed inset-0 pointer-events-none z-10"
+        style={{
+          background: `radial-gradient(circle 200px at ${glowX}px ${glowY}px, rgba(138, 43, 226, 0.15), transparent)`,
+          opacity: glowOpacity,
+        }}
+      />
+
+      {/* Progress bar */}
+      <motion.div
+        className="fixed top-0 left-0 right-0 h-1 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 z-50"
+        style={{ scaleX, transformOrigin: "0%" }}
+      />
+
+      {/* Crypto ticker */}
+      <div className="fixed bottom-0 left-0 right-0 bg-gray-900/80 text-xs py-1 px-4 flex justify-between items-center z-40">
+        <span className="text-indigo-300">
+          ETH: ${cryptoPrice.eth.toFixed(2)}
+        </span>
+        <span className="text-purple-300">
+          BTC: ${cryptoPrice.btc.toFixed(2)}
+        </span>
+        <span className="text-pink-300">Latest Block: {blockNumber}</span>
+      </div>
+
+      {/* Navigation */}
+      <nav className="fixed top-0 left-0 right-0 bg-gray-900/80 backdrop-blur-sm z-40 border-b border-indigo-500/20">
+        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
+          <motion.span
+            className="text-xl font-bold bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400 text-transparent bg-clip-text"
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
           >
-            <Image
-              className="dark:invert"
-              src="https://nextjs.org/icons/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+            FM
+          </motion.span>
+          <div className="flex gap-6">
+            {sections.map((section, index) => (
+              <motion.div
+                key={section}
+                initial={{ opacity: 0, y: -20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: index * 0.1 }}
+              >
+                <Button
+                  variant="ghost"
+                  className={`text-white ${
+                    activeSection === section
+                      ? "bg-indigo-500/20"
+                      : "hover:text-indigo-400"
+                  }`}
+                  onClick={() =>
+                    document
+                      .getElementById(section)
+                      ?.scrollIntoView({ behavior: "smooth" })
+                  }
+                >
+                  {section.charAt(0).toUpperCase() + section.slice(1)}
+                </Button>
+              </motion.div>
+            ))}
+          </div>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
+      </nav>
+
+      <HeroSection />
+      <ExperienceSection />
+      <SkillsSection />
+      <ProjectsSection />
+      <CommunityLeadershipSection />
+      <WorkshopsSection />
+      <InfiniteMovingCardsDemo />
+      <ContactSection />
+
+      {/* Footer */}
+      <footer className="py-12 bg-black">
+        <div className="container mx-auto px-4 text-center">
+          <p className="text-gray-500">
+            © 2024 Fadhil Mulinya | Empowering Africa's Web3 Future
+          </p>
+        </div>
       </footer>
     </div>
   );
