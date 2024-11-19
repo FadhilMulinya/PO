@@ -72,7 +72,7 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-900 to-black text-white overflow-hidden">
-      <Background3D />
+    { <Background3D /> }
 
       {/* Subtle gradient background */}
       <div className="fixed inset-0 bg-gradient-to-br from-indigo-900/20 via-purple-900/20 to-gray-900/20 z-0" />
