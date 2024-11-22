@@ -18,6 +18,7 @@ import { ProjectsSection } from "./components/app/ProjectsSection";
 import { CommunityLeadershipSection } from "./components/app/CommunityLeadershipSection";
 import { WorkshopsSection } from "./components/app/WokshopSection";
 import { ContactSection } from "./components/app/ContactSection";
+import { AnimatedTestimonialsDemo } from "./components/app/AnimatedTestimonialsDemo";
 
 const Background3D = dynamic(() => import("./components/ui/Background3D"), {
   ssr: false,
@@ -150,6 +151,7 @@ export default function Home() {
       <CommunityLeadershipSection />
       <WorkshopsSection />
       <InfiniteMovingCardsDemo />
+      <AnimatedTestimonialsDemo/>
       <ContactSection />
 
       {/* Footer */}
